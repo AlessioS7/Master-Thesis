@@ -1,0 +1,22 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: my-mongo-sink-connector 
+  labels:
+    strimzi.io/cluster: my-connect-cluster
+spec:
+  class: com.mongodb.kafka.connect.MongoSinkConnector
+  tasksMax: 2 
+  config: 
+    topics : signals # temperature, humidity, light
+    connection.uri: mongodb://my-user:my-user@mongodb-0.mongodb-svc.default.svc.cluster.local:27017,mongodb-1.mongodb-svc.default.svc.cluster.local:27017,mongodb-2.mongodb-svc.default.svc.cluster.local:27017/admin?replicaSet=mongodb&ssl=false
+    database: myDb
+    # collection: myCollection
+    namespace.mapper : com.mongodb.kafka.connect.sink.namespace.mapping.FieldPathNamespaceMapper
+    namespace.mapper.key.database.field: "db"
+    namespace.mapper.key.collection.field : "topic"
+    key.converter.schemas.enable: false
+    value.converter.schemas.enable: false
+    key.converter: org.apache.kafka.connect.json.JsonConverter # org.apache.kafka.connect.storage.StringConverter 
+    value.converter: org.apache.kafka.connect.json.JsonConverter # org.apache.kafka.connect.storage.StringConverter
+    
